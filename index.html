@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Як ви себе почуваєте?</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #E3F2FD 0%, #E1BEE7 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            background: linear-gradient(135deg, #5E9CE6 0%, #9C7FB8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.2em;
+            margin-bottom: 15px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            color: #555;
+        }
+
+        .progress-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(94, 156, 230, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #5E9CE6 0%, #9C7FB8 100%);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: #5E9CE6;
+            font-weight: bold;
+        }
+
+        .question-card {
+            background-color: #fff;
+            padding: 35px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(94, 156, 230, 0.2);
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .question-card.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-number {
+            color: #5E9CE6;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .question-text {
+            font-size: 1.4em;
+            margin-bottom: 30px;
+            color: #333;
+            text-align: center;
+        }
+
+        .scale-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .scale-option {
+            flex: 1;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .scale-option input[type="radio"] {
+            display: none;
+        }
+
+        .scale-option label {
+            display: block;
+            padding: 15px 10px;
+            background-color: #f5f5f5;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #666;
+        }
+
+        .scale-option input[type="radio"]:checked + label {
+            background: linear-gradient(135deg, #5E9CE6 0%, #9C7FB8 100%);
+            border-color: #5E9CE6;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .scale-option label:hover {
+            border-color: #5E9CE6;
+        }
+
+        .scale-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #5E9CE6 0%, #9C7FB8 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 20px auto 0;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(94, 156, 230, 0.4);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-container {
+            display: none;
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(94, 156, 230, 0.2);
+            text-align: center;
+        }
+
+        .result-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .result-icon {
+            font-size: 5em;
+            margin: 20px 0;
+        }
+
+        .result-score {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #5E9CE6 0%, #9C7FB8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+
+        .result-title {
+            font-size: 1.8em;
+            color: #5E9CE6;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .result-description {
+            font-size: 1.1em;
+            line-height: 1.8;
+            color: #555;
+            margin-bottom: 30px;
+        }
+
+        .result-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #F0F7FF 0%, #F3E5F5 100%);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .metric-card h4 {
+            color: #5E9CE6;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #9C7FB8;
+        }
+
+        .metric-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .metric-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #5E9CE6 0%, #9C7FB8 100%);
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 1.6em;
+            }
+
+            .question-text {
+                font-size: 1.2em;
+            }
+
+            .scale-option label {
+                padding: 12px 8px;
+                font-size: 1em;
+            }
+
+            .result-metrics {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Як ви себе почуваєте?</h1>
+            <p>Відповідайте чесно — це допоможе нам краще підтримувати вас на шляху навчання.</p>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">Запитання 1 з 5</div>
+        </div>
+
+        <div id="questionsContainer"></div>
+
+        <div class="result-container" id="resultContainer">
+            <div class="result-icon" id="resultIcon"></div>
+            <div class="result-score" id="resultScore"></div>
+            <div class="result-title" id="resultTitle"></div>
+            <div class="result-description" id="resultDescription"></div>
+            <div class="result-metrics" id="resultMetrics"></div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            { 
+                text: "Наскільки ви зараз відчуваєте натхнення до навчання?", 
+                category: "Мотивація",
+                icon: "🔥"
+            },
+            { 
+                text: "Як ви оцінюєте свій настрій прямо зараз?", 
+                category: "Емоційний стан",
+                icon: "😊"
+            },
+            { 
+                text: "Наскільки ви задоволені своїм рухом вперед?", 
+                category: "Відчуття прогресу",
+                icon: "📈"
+            },
+            { 
+                text: "Скільки у вас зараз енергії для навчання?", 
+                category: "Рівень енергії",
+                icon: "⚡"
+            },
+            { 
+                text: "Наскільки ви віритє у свої сили?", 
+                category: "Впевненість",
+                icon: "💪"
+            }
+        ];
+
+        let currentQuestion = 0;
+        let answers = [];
+
+        function initQuiz() {
+            const container = document.getElementById('questionsContainer');
+            
+            questions.forEach((question, index) => {
+                const card = document.createElement('div');
+                card.className = 'question-card';
+                if (index === 0) card.classList.add('active');
+                
+                card.innerHTML = `
+                    <div class="question-number">Запитання ${index + 1} з ${questions.length}</div>
+                    <div class="question-text">${question.icon} ${question.text}</div>
+                    <div class="scale-container">
+                        ${[1, 2, 3, 4, 5].map(value => `
+                            <div class="scale-option">
+                                <input type="radio" id="q${index}_${value}" name="q${index}" value="${value}">
+                                <label for="q${index}_${value}">${value}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="scale-labels">
+                        <span>Зовсім ні</span>
+                        <span>Дуже сильно</span>
+                    </div>
+                    <button class="btn" onclick="nextQuestion(${index})" id="btn${index}" disabled>
+                        ${index === questions.length - 1 ? 'Дізнатися результат' : 'Далі'}
+                    </button>
+                `;
+                
+                container.appendChild(card);
+                
+                const radios = card.querySelectorAll(`input[name="q${index}"]`);
+                radios.forEach(radio => {
+                    radio.addEventListener('change', () => {
+                        document.getElementById(`btn${index}`).disabled = false;
+                    });
+                });
+            });
+        }
+
+        function nextQuestion(index) {
+            const selectedValue = parseInt(document.querySelector(`input[name="q${index}"]:checked`).value);
+            answers.push({
+                category: questions[index].category,
+                icon: questions[index].icon,
+                value: selectedValue
+            });
+            
+            const cards = document.querySelectorAll('.question-card');
+            cards[index].classList.remove('active');
+            
+            if (index < questions.length - 1) {
+                cards[index + 1].classList.add('active');
+                currentQuestion++;
+                updateProgress();
+            } else {
+                showResult();
+            }
+        }
+
+        function updateProgress() {
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressText').textContent = `Запитання ${currentQuestion + 1} з ${questions.length}`;
+        }
+
+        function showResult() {
+            const totalScore = answers.reduce((sum, answer) => sum + answer.value, 0);
+            const maxScore = questions.length * 5;
+            const percentage = (totalScore / maxScore) * 100;
+
+            document.querySelector('.progress-container').style.display = 'none';
+            document.getElementById('resultContainer').classList.add('active');
+            document.getElementById('resultScore').textContent = `${totalScore} з ${maxScore} балів`;
+
+            let icon, title, description;
+
+            if (percentage >= 80) {
+                icon = '🚀';
+                title = 'Ви на піднесенні!';
+                description = 'Чудово! Ваш емоційний стан та мотивація на високому рівні. Ви повні енергії та готові до нових досягнень. Продовжуйте в тому ж дусі!';
+            } else if (percentage >= 60) {
+                icon = '⭐';
+                title = 'Ви в ресурсі!';
+                description = 'Добре! Ви маєте достатньо сил та мотивації для навчання. Є простір для зростання, але ви на правильному шляху. Продовжуйте дбати про себе.';
+            } else if (percentage >= 40) {
+                icon = '🌱';
+                title = 'Потрібна підтримка';
+                description = 'Зараз ви можливо відчуваєте втому або потребуєте додаткової підтримки. Це нормально — навчання має свої хвилі. Дайте собі час відновитися.';
+            } else {
+                icon = '💙';
+                title = 'Час для перепочинку';
+                description = 'Схоже, вам потрібна пауза та підтримка. Не поспішайте — навчання це марафон, а не спринт. Подбайте про себе, відпочиньте та поверніться з новими силами.';
+            }
+
+            document.getElementById('resultIcon').textContent = icon;
+            document.getElementById('resultTitle').textContent = title;
+            document.getElementById('resultDescription').textContent = description;
+
+            const metricsHtml = answers.map(answer => `
+                <div class="metric-card">
+                    <h4>${answer.icon} ${answer.category}</h4>
+                    <div class="metric-value">${answer.value}/5</div>
+                    <div class="metric-bar">
+                        <div class="metric-bar-fill" style="width: ${(answer.value / 5) * 100}%"></div>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('resultMetrics').innerHTML = metricsHtml;
+        }
+
+        initQuiz();
+    </script>
+</body>
+</html>
